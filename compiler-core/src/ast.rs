@@ -417,43 +417,6 @@ impl TypeAstConstructorName {
             TypeAstConstructorName::Qualified { name: None, .. } => None,
         }
     }
-
-    fn is_logically_equal(&self, other: &TypeAstConstructorName) -> bool {
-        match (self, other) {
-            (
-                TypeAstConstructorName::Qualified { module, name, .. },
-                TypeAstConstructorName::Qualified {
-                    module: other_module,
-                    name: other_name,
-                    ..
-                },
-            ) => {
-                module == other_module
-                    && match (name, other_name) {
-                        (Some((name, _)), Some((other_name, _))) => name == other_name,
-                        (None, Some(_)) | (Some(_), None) => false,
-                        (None, None) => true,
-                    }
-            }
-
-            (
-                TypeAstConstructorName::Unqualified { name, location: _ },
-                TypeAstConstructorName::Unqualified {
-                    name: other_name,
-                    location: _,
-                },
-            ) => name == other_name,
-
-            (
-                TypeAstConstructorName::Qualified { .. },
-                TypeAstConstructorName::Unqualified { .. },
-            )
-            | (
-                TypeAstConstructorName::Unqualified { .. },
-                TypeAstConstructorName::Qualified { .. },
-            ) => false,
-        }
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -498,90 +461,6 @@ impl TypeAst {
             | TypeAst::Hole(TypeAstHole { location, .. })
             | TypeAst::Tuple(TypeAstTuple { location, .. })
             | TypeAst::Constructor(TypeAstConstructor { location, .. }) => *location,
-        }
-    }
-
-    pub fn is_logically_equal(&self, other: &TypeAst) -> bool {
-        match self {
-            TypeAst::Constructor(TypeAstConstructor {
-                name,
-                arguments,
-                location: _,
-                start_parentheses: _,
-            }) => match other {
-                TypeAst::Constructor(TypeAstConstructor {
-                    name: other_name,
-                    arguments: other_arguments,
-                    location: _,
-                    start_parentheses: _,
-                }) => {
-                    name.is_logically_equal(other_name)
-                        && arguments.len() == other_arguments.len()
-                        && arguments
-                            .iter()
-                            .zip(other_arguments)
-                            .all(|argument| argument.0.is_logically_equal(argument.1))
-                }
-                TypeAst::Fn(_) | TypeAst::Var(_) | TypeAst::Tuple(_) | TypeAst::Hole(_) => false,
-            },
-            TypeAst::Fn(TypeAstFn {
-                arguments,
-                return_,
-                location: _,
-            }) => match other {
-                TypeAst::Fn(TypeAstFn {
-                    arguments: o_arguments,
-                    return_: o_return_,
-                    location: _,
-                }) => {
-                    arguments.len() == o_arguments.len()
-                        && arguments
-                            .iter()
-                            .zip(o_arguments)
-                            .all(|a| a.0.is_logically_equal(a.1))
-                        && return_.is_logically_equal(o_return_)
-                }
-                TypeAst::Constructor(_)
-                | TypeAst::Var(_)
-                | TypeAst::Tuple(_)
-                | TypeAst::Hole(_) => false,
-            },
-            TypeAst::Var(TypeAstVar { name, location: _ }) => match other {
-                TypeAst::Var(TypeAstVar {
-                    name: o_name,
-                    location: _,
-                }) => name == o_name,
-                TypeAst::Constructor(_) | TypeAst::Fn(_) | TypeAst::Tuple(_) | TypeAst::Hole(_) => {
-                    false
-                }
-            },
-            TypeAst::Tuple(TypeAstTuple {
-                elements,
-                location: _,
-            }) => match other {
-                TypeAst::Tuple(TypeAstTuple {
-                    elements: other_elements,
-                    location: _,
-                }) => {
-                    elements.len() == other_elements.len()
-                        && elements
-                            .iter()
-                            .zip(other_elements)
-                            .all(|a| a.0.is_logically_equal(a.1))
-                }
-                TypeAst::Constructor(_) | TypeAst::Fn(_) | TypeAst::Var(_) | TypeAst::Hole(_) => {
-                    false
-                }
-            },
-            TypeAst::Hole(TypeAstHole { name, location: _ }) => match other {
-                TypeAst::Hole(TypeAstHole {
-                    name: o_name,
-                    location: _,
-                }) => name == o_name,
-                TypeAst::Constructor(_) | TypeAst::Fn(_) | TypeAst::Var(_) | TypeAst::Tuple(_) => {
-                    false
-                }
-            },
         }
     }
 
