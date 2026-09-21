@@ -93,10 +93,6 @@ impl Hydrator {
         self.rigid_type_names.contains_key(id)
     }
 
-    pub fn rigid_names(&self) -> imbl::HashMap<u64, EcoString> {
-        self.rigid_type_names.clone()
-    }
-
     pub fn type_from_option_ast(
         &mut self,
         ast: &Option<TypeAst>,

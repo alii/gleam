@@ -29,10 +29,6 @@ impl<'a, 'doc> Printer {
         Self::default()
     }
 
-    pub fn with_names(&mut self, names: imbl::HashMap<u64, EcoString>) {
-        self.names = names;
-    }
-
     /// Render a Type as a well formatted string.
     ///
     pub fn pretty_print(&mut self, type_: &Type, initial_indent: usize) -> String {

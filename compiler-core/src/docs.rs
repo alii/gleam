@@ -519,13 +519,6 @@ pub fn package_interface(
         .expect("JSON module interface serialisation")
 }
 
-pub fn generate_json_package_information(path: Utf8PathBuf, config: PackageConfig) -> OutputFile {
-    OutputFile {
-        path,
-        content: Content::Text(package_information_as_json(config)),
-    }
-}
-
 pub fn package_information_as_json(config: PackageConfig) -> String {
     let info = PackageInformation {
         package_config: config,

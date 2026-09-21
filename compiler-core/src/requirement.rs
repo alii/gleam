@@ -130,9 +130,6 @@ where
     Range::new(version).map_err(de::Error::custom)
 }
 
-#[derive(Debug, Copy, Clone)]
-pub struct Void;
-
 impl FromStr for Requirement {
     type Err = Error;
 

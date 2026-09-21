@@ -2299,21 +2299,6 @@ impl CompiledCase {
             subject_variables: vec![],
         }
     }
-
-    /// The decision tree for simple variable assignment, such as in the following
-    /// assignment:
-    /// ```gleam
-    /// let x = 10
-    /// ```
-    pub fn simple_variable_assignment(name: EcoString, type_: Arc<Type>) -> Self {
-        let variable = Variable::new(0, type_);
-        let mut body = Body::new(0);
-        body.assign(name, variable.clone());
-        Self {
-            tree: Decision::Run { body },
-            subject_variables: vec![variable],
-        }
-    }
 }
 
 /// Whether a pattern is reachable, or why it is unreachable.

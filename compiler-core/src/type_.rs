@@ -511,33 +511,6 @@ impl Type {
         }
     }
 
-    pub fn find_internal_type(&self) -> Option<Self> {
-        match self {
-            Self::Named { publicity, .. } if publicity.is_internal() => Some(self.clone()),
-
-            Self::Named { arguments, .. } => arguments
-                .iter()
-                .find_map(|type_| type_.find_internal_type()),
-
-            Self::Tuple { elements, .. } => {
-                elements.iter().find_map(|type_| type_.find_internal_type())
-            }
-
-            Self::Fn {
-                return_, arguments, ..
-            } => return_.find_internal_type().or_else(|| {
-                arguments
-                    .iter()
-                    .find_map(|type_| type_.find_internal_type())
-            }),
-
-            Self::Var { type_, .. } => match type_.borrow().deref() {
-                TypeVar::Unbound { .. } | TypeVar::Generic { .. } => None,
-                TypeVar::Link { type_, .. } => type_.find_internal_type(),
-            },
-        }
-    }
-
     pub fn fn_arity(&self) -> Option<usize> {
         match self {
             Self::Fn { arguments, .. } => Some(arguments.len()),
